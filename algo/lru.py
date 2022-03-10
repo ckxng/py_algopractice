@@ -4,8 +4,14 @@ class LRUElement:
         self.value = value
 
 class LRUCache:
+    """
+    a cache containing the most recently accessed elements
+    """
 
     def __init__(self, capacity):
+        """
+        :param capacity: the number of elements to store in the cache
+        """
         self.capacity = capacity
         self.__cache = []
 
@@ -26,6 +32,11 @@ class LRUCache:
             del self.__cache[cache_size - 1]
 
     def get(self, x):
+        """
+        get an element from the cache by key, or raise KeyError if the element is not found
+        :param x: the key to fetch
+        :return: the content related to that key
+        """
         # raises exception if key not found
         index = self.__lookup_index_by_key(x)
 
@@ -39,5 +50,11 @@ class LRUCache:
         return self.__cache[0].value
 
     def set(self, x, y):
+        """
+        add an element to the cache.  if the cache is already at-capacity, the least recently
+        accessed element will be removed
+        :param x: the key of the object to cache
+        :param y: the content of the object to cache
+        """
         self.__cache.insert(0, LRUElement(x, y))
         self.__prune()
