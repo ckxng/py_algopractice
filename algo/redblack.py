@@ -132,7 +132,40 @@ def _left_rotation(node):
 
 
 def _right_rotation(node):
-    raise Exception("Unimplemented")
+    #      parent        parent
+    #      /  \     =>    / \
+    #    node    4       X   4
+    #    /  \           /  \
+    #   X    3         1   node
+    #  / \                 /  \
+    # 1   2               2    3
+    parent = node.parent
+    x = node.left
+
+    # when node.left is None, a right rotation cannot be performed
+    if x is None:
+        raise NullNodeError()
+
+    x_right = x.right
+
+    # move x into position as a child of our parent
+    # node is now unconnected
+    if parent is not None:
+        if parent.left == node:
+            parent.left = x
+        else:
+            parent.right = x
+    x.parent = parent
+
+    # move node into position at x.right
+    # the node originally at x.right is now unconnected
+    x.right = node
+    node.parent = x
+
+    # move the node originally at x.right to node.right
+    node.left = x_right
+    if x_right is not None:
+        x_right.parent = node
 
 
 def _find_node_by_key(node, key):
