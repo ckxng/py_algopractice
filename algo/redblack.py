@@ -205,8 +205,6 @@ class RedBlackTree:
             _red_uncle_recolor(parent)
 
         else:
-            # TODO uncle is black
-
             # determine this node and parent's position within their parents
             parent_left_of_grand = True
             if inserted.parent.parent.left != inserted.parent:
