@@ -183,6 +183,90 @@ def _find_node_by_key(node, key):
     return found
 
 
+def _copy_node(src, dest):
+    dest.key = src.key
+    dest.content = src.content
+
+
+def _rebalance_double_black(node):
+    # rebalancing is required when a leaf node is deleted that is not the root
+    if node.parent is not None:
+        sibling = _find_sibling(node)
+        if _get_node_color(sibling) == BLACK:
+            # Case 1a - sibling is black and one at least one child is red
+            if _get_node_color(sibling.left) == RED or _get_node_color(sibling.right) == RED:
+                raise Exception("Unimplimented")
+
+            # Case1b - sibling is black and both children are black
+            else:
+                raise Exception("Unimplimented")
+
+        # Case 1c - sibling is red
+        else:
+            raise Exception("Unimplimented")
+
+
+def _replace_parent_with_child(child, parent):
+    # if the two merging nodes are different colors, make the new node black
+    # merge, and delete the old child
+    if _get_node_color(parent) != _get_node_color(child):
+        node.color = BLACK
+        _copy_node(child, parent)
+        _delete_node(child)
+
+    # the nodes are both BLACK, and must be rebalanced
+    else:
+        raise("Unimplimented")
+
+
+def _delete_node(node):
+    # non-existant nodes can't be deleted!
+    if node is None:
+        raise NullNodeError()
+
+    parent = node.parent
+
+    # Case 1 - leaf node
+    if node.left is None and node.right is None:
+        # deleting a leaf node causes a double-black condition
+        # and needs rebalancing
+        _rebalance_double_black(node)
+
+        # remove the node
+        if node.parent is not None:
+            node.parent = None
+            del node
+
+    # left child exists
+    elif node.left is not None:
+
+        # Case 2a - left is an only child.
+        if node.right is None:
+            _replace_parent_with_child(node.left, node)
+
+        # Case 3 - node has two children
+        else:
+            # find in-order sucessor of this node
+            sucessor = node.right
+            while sucessor.left is not None:
+                sucessor = sucessor.left
+
+            # if the in-order sucessor is also a child, use the defined process for that
+            if sucessor == node.right:
+                _replace_parent_with_child(sucessor, node)
+
+            # copy the sucessor into node, and delete sucessor
+            # (where sucessor is not a child of node)
+            # (sucessor is also always a leaf or has only a right child)
+            else:
+                _copy_node(sucessor, node)
+                _delete_node(sucessor)
+
+    # Case 2b - right is an only child
+    else:
+        _replace_parent_with_child(node.right, node)
+
+
 class RedBlackTree:
     def __init__(self):
         self.__root = None
@@ -246,7 +330,13 @@ class RedBlackTree:
                 self.__root = self.__root.parent
 
     def delete(self, key):
-        raise Exception("Unimplemented")
+        node = _find_node_by_key(self.__root, key)
+
+        # if the node cannot be found, it cannot be deleted!
+        if node is None:
+            return KeyError()
+
+        _delete_node(node)
 
     def get_content(self, key):
         found = _find_node_by_key(self.__root, key)
@@ -277,4 +367,6 @@ if __name__ == '__main__':
     tree.insert(800, 'g')
     tree.insert(900, 'h')
     import pprint
+    pprint.pprint(tree._describe())
+    tree.delete(500)
     pprint.pprint(tree._describe())

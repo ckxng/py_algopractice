@@ -114,6 +114,13 @@ class TestRedBlack(unittest.TestCase):
                           tree.get_content,
                           600)
 
+    def test_copy_node(self):
+        tree = _create_tree()
+        redblack._copy_node(tree.right.right, tree.right)
+        self.assertEqual(tree.right.right.key, tree.right.key)
+        self.assertEqual(tree.right.right.content, tree.right.content)
+        self.assertNotEqual(tree.right.right.parent, tree.right.parent)
+
 
 if __name__ == '__main__':
     unittest.main()
