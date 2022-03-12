@@ -30,6 +30,16 @@ def _insert_tree():
 
 
 class TestRedBlack(unittest.TestCase):
+    def test_create_tree_and(self):
+        tree = _create_tree()
+        self.assertEqual(tree.key, 500)
+        self.assertEqual(tree.left.left.key, 100)
+        self.assertEqual(tree.right.right.key, 900)
+
+    def test_validate_redblack_tree(self):
+        tree = _create_tree()
+        self.assertTrue(redblack._validate_redblack_tree(tree))
+
     def test_find_closest_ancestor_by_key(self):
         tree = _create_tree()
         found = redblack._find_closest_ancestor_by_key(tree, 750)
@@ -97,8 +107,9 @@ class TestRedBlack(unittest.TestCase):
 
     def test_red_uncle_recolor(self):
         tree = _create_tree()
-        redblack._red_uncle_recolor(tree.left)
-        self.assertEqual(tree.color, redblack.RED)
+        tree.right.right.color = redblack.RED
+        redblack._red_uncle_recolor(tree.right)
+        self.assertEqual(tree.color, redblack.BLACK)
         self.assertEqual(tree.left.color, redblack.BLACK)
         self.assertEqual(tree.right.color, redblack.BLACK)
 
@@ -113,6 +124,10 @@ class TestRedBlack(unittest.TestCase):
         self.assertRaises(KeyError,
                           tree.get_content,
                           600)
+
+    def test_insert_and_validate(self):
+        tree = _insert_tree()
+        self.assertTrue(tree._validate())
 
     def test_copy_node(self):
         tree = _create_tree()

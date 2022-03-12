@@ -83,13 +83,14 @@ def _red_uncle_recolor(node):
     if sibling is not None:
         _flip_color(sibling)
 
-    # change parent color if a parent exists, if not, then we are done
-    if node.parent is not None:
+    # change parent color if parent exists and parent and child are both red
+    # if not, then we are done
+    if node.parent is not None and _get_node_color(node) == RED and _get_node_color(node.parent) == RED:
         _flip_color(node.parent)
     else:
         return
 
-        # check if our uncle is red, if so, repeat this process
+    # check if our uncle is red, if so, repeat this process
     if _get_node_color(_find_sibling(node.parent)) == RED:
         _red_uncle_recolor(node.parent)
 
@@ -267,6 +268,26 @@ def _delete_node(node):
         _replace_parent_with_child(node.right, node)
 
 
+def _validate_redblack_tree(node):
+    """
+    return true if the tree is valid, else false
+    :param node: the root node of the tree to validate
+    :return: True if the tree is valid, else False
+    """
+    # a null node is black, and valid
+    if node is None:
+        return True
+
+    # any combination is ok as long as a red parent does not have any red children
+    if _get_node_color(node) == RED and (
+            _get_node_color(node.left) == RED or
+            _get_node_color(node.right) == RED):
+        return False
+
+    # return true only if all children are valid
+    return _validate_redblack_tree(node.left) and _validate_redblack_tree(node.right)
+
+
 class RedBlackTree:
     def __init__(self):
         self.__root = None
@@ -348,17 +369,27 @@ class RedBlackTree:
         def _describe_traversal(node):
             if node is None:
                 return None
+            parent_key = None
+            if node.parent is not None:
+                parent_key = node.parent.key
             return {
                 'key': node.key,
                 'color': node.color,
+                'parent_key': parent_key,
                 'left': _describe_traversal(node.left),
                 'right': _describe_traversal(node.right)
             }
         return _describe_traversal(self.__root)
 
+    def _validate(self):
+        return _validate_redblack_tree(self.__root)
+
 
 if __name__ == '__main__':
+    import pprint
+
     tree = RedBlackTree()
+
     tree.insert(100, 'a')
     tree.insert(200, 'b')
     tree.insert(300, 'c')
@@ -366,7 +397,6 @@ if __name__ == '__main__':
     tree.insert(700, 'f')
     tree.insert(800, 'g')
     tree.insert(900, 'h')
-    import pprint
     pprint.pprint(tree._describe())
     tree.delete(500)
     pprint.pprint(tree._describe())
