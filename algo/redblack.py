@@ -210,7 +210,7 @@ def _replace_parent_with_child(child, parent):
     # if the two merging nodes are different colors, make the new node black
     # merge, and delete the old child
     if _get_node_color(parent) != _get_node_color(child):
-        node.color = BLACK
+        parent.color = BLACK
         _copy_node(child, parent)
         _delete_node(child)
 
