@@ -52,7 +52,7 @@ def _insert_at_node(node, key, content, color=RED):
 
 def _find_sibling(node):
     if node is None or node.parent is None:
-        raise NullNodeError()
+        return None
 
     # return this node's sibling
     if node.parent.left == node:
@@ -206,7 +206,46 @@ class RedBlackTree:
 
         else:
             # TODO uncle is black
-            raise Exception("Unimplemented")
+
+            # determine this node and parent's position within their parents
+            parent_left_of_grand = True
+            if inserted.parent.parent.left != inserted.parent:
+                parent_left_of_grand = False
+
+            inserted_left_of_parent = True
+            if inserted.parent.left != inserted:
+                inserted_left_of_parent = False
+
+            # Case 1 - left left
+            if parent_left_of_grand and inserted_left_of_parent:
+                _flip_color(inserted.parent.parent)
+                _flip_color(inserted.parent)
+                _right_rotation(inserted.parent.parent)
+
+            # Case 2 - left right
+            elif parent_left_of_grand and not inserted_left_of_parent:
+                _flip_color(inserted.parent.parent)
+                _flip_color(inserted)
+                _left_rotation(inserted.parent)
+                _right_rotation(inserted.parent)
+
+            # Case 3 - right right
+            elif not parent_left_of_grand and not inserted_left_of_parent:
+                _flip_color(inserted.parent.parent)
+                _flip_color(inserted.parent)
+                _left_rotation(inserted.parent.parent)
+
+            # Case 4 - right left
+            elif not parent_left_of_grand and inserted_left_of_parent:
+                _flip_color(inserted.parent.parent)
+                _flip_color(inserted)
+                _right_rotation(inserted.parent)
+                _left_rotation(inserted.parent)
+
+            # verify or update self.__root to be the greatest ancestor if it
+            # is not already so, since we had to re-organize
+            while self.__root.parent is not None:
+                self.__root = self.__root.parent
 
     def delete(self, key):
         raise Exception("Unimplemented")
@@ -216,3 +255,28 @@ class RedBlackTree:
         if found is not None:
             return found.content
         raise KeyError()
+
+    def _describe(self):
+        def _describe_traversal(node):
+            if node is None:
+                return None
+            return {
+                'key': node.key,
+                'color': node.color,
+                'left': _describe_traversal(node.left),
+                'right': _describe_traversal(node.right)
+            }
+        return _describe_traversal(self.__root)
+
+
+if __name__ == '__main__':
+    tree = RedBlackTree()
+    tree.insert(100, 'a')
+    tree.insert(200, 'b')
+    tree.insert(300, 'c')
+    tree.insert(500, 'e')
+    tree.insert(700, 'f')
+    tree.insert(800, 'g')
+    tree.insert(900, 'h')
+    import pprint
+    pprint.pprint(tree._describe())

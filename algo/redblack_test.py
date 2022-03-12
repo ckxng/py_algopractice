@@ -16,6 +16,19 @@ def _create_tree():
     return root
 
 
+def _insert_tree():
+    tree = redblack.RedBlackTree()
+    tree.insert(100, 'a')
+    tree.insert(200, 'b')
+    tree.insert(300, 'c')
+    tree.insert(500, 'e')
+    tree.insert(700, 'f')
+    tree.insert(800, 'g')
+    tree.insert(900, 'h')
+
+    return tree
+
+
 class TestRedBlack(unittest.TestCase):
     def test_find_closest_ancestor_by_key(self):
         tree = _create_tree()
@@ -24,8 +37,8 @@ class TestRedBlack(unittest.TestCase):
 
     def test_find_sibling(self):
         tree = _create_tree()
-        found = redblack._find_sibling(tree.left.right)
-        self.assertEqual(found.key, 100)
+        self.assertEqual(redblack._find_sibling(tree.left.right).key, 100)
+        self.assertEqual(redblack._find_sibling(tree), None)
 
     def test_get_node_color(self):
         tree = _create_tree()
@@ -81,6 +94,25 @@ class TestRedBlack(unittest.TestCase):
                           redblack._find_node_by_key,
                           None,
                           700)  # no tree provided
+
+    def test_red_uncle_recolor(self):
+        tree = _create_tree()
+        redblack._red_uncle_recolor(tree.left)
+        self.assertEqual(tree.color, redblack.RED)
+        self.assertEqual(tree.left.color, redblack.BLACK)
+        self.assertEqual(tree.right.color, redblack.BLACK)
+
+    def test_describe(self):
+        tree = _insert_tree()
+        result = tree._describe()
+        self.assertEqual(result['right']['left']['key'], 300)
+
+    def test_insert_and_get(self):
+        tree = _insert_tree()
+        self.assertEqual(tree.get_content(800), 'g')
+        self.assertRaises(KeyError,
+                          tree.get_content,
+                          600)
 
 
 if __name__ == '__main__':
